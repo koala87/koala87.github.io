@@ -3,12 +3,13 @@
   <entry>
     <title><![CDATA[Java内存区域与内存溢出异常]]></title>
     <url>%2F2018%2F12%2F18%2Fjava-memory%2F</url>
-    <content type="text"><![CDATA[了解Java运行时数据区域，几种常见的内存异常；了解垃圾回收原理；了解常见的内存问题分析工具。 运行时数据区域 1、程序计数器如果线程执行的是Java方法，计数器记录的是正在执行的虚拟机字节码地址；如果正在执行的是Native方法，这个计数器值为空（Undefined）。此区域是唯一一个规范里没有规定任何OutOfMemoryError情况的区域。 2、Java虚拟机栈用于存储局部变量表、操作数栈、动态链接、方法出口等信息。局部变量表存放了编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型）。此区域规定了两种异常情况：如果线程请求的栈深度大于虚拟机允许深度，将抛出StackOverflowError；如果虚拟机栈可以动态扩展，如果扩展时无法申请到足够内存，就会抛出OutOfMemoryError。 3、本地方法栈Native Method Stack。有的虚拟机，比如HotSpot，直接将本地方法栈与虚拟机栈合二为一。与虚拟机栈一样，也会抛出StackOverflowError和OutOfMemoryError。 4、Java堆虚拟机规范中描述：所有的对象实例以及数组都要在堆上分配，但是随着JIT编译器的发展与逃逸分析技术逐渐成熟，栈上分配、标量替换优化技术将会导致一些微妙的变化发生，所有对象都分配在堆上也渐渐变得不是那么“绝对”了。 Java椎是垃圾收集器管理主要区域，也叫“GC堆”（Garbage Collected Heap）。细分为新生代和老生代；再细致有Eden空间、From Survivor空间、To Survivor空间等。从内存分配角度，线程共享的Java椎中可能分出多个线程私有的分配缓冲区（Thread Local Allocation Buffer，TLAB）。 Java堆可以处于物理上不连续的内存，只要逻辑上是连续的即可。 5、方法区存储已被虚拟机加载的类信息、常量、静态变量、即使编译器编译后的代码等数据。HotSpot实现中，把方法区放在“永久代”（Permanent Generation），简化了内存管理，可以像管理堆一样管理这部分内存。规范对方法区限制比较宽松，可以选择不实现垃圾收集。当方法区无法满足内存分配需求时，将抛出OutOfMemoryError。 6、运行时常量池Runtime Constant Pool是方法区一部分。会抛出OutOfMemoryError。 7、直接内存JDK1.4中新加入NIO（New Input/Output）类，引入一种基于Channel与Buffer的I/O方式，它可以使用Native函数直接分配堆外内存，然后通过一个存储在Java堆中的DirectByteBuffer对象作为这块内存的引用进行操作。 本机直接内存分配不会受到Java堆大小限制，但是肯定还是受到本机内存（包括RAM以及SWAP区或者分页文件）大小以及处理器寻址空间限制。会抛出OutOfMemoryError异常。]]></content>
+    <content type="text"><![CDATA[了解Java运行时数据区域，几种常见的内存异常；了解垃圾回收原理；了解常见的内存问题分析工具。 运行时数据区域 程序计数器如果线程执行的是Java方法，计数器记录的是正在执行的虚拟机字节码地址；如果正在执行的是Native方法，这个计数器值为空（Undefined）。此区域是唯一一个规范里没有规定任何OutOfMemoryError情况的区域。 Java虚拟机栈用于存储局部变量表、操作数栈、动态链接、方法出口等信息。局部变量表存放了编译期可知的各种基本数据类型（boolean、byte、char、short、int、float、long、double）、对象引用（reference类型）。此区域规定了两种异常情况：如果线程请求的栈深度大于虚拟机允许深度，将抛出StackOverflowError；如果虚拟机栈可以动态扩展，如果扩展时无法申请到足够内存，就会抛出OutOfMemoryError。 本地方法栈Native Method Stack。有的虚拟机，比如HotSpot，直接将本地方法栈与虚拟机栈合二为一。与虚拟机栈一样，也会抛出StackOverflowError和OutOfMemoryError。 Java堆虚拟机规范中描述：所有的对象实例以及数组都要在堆上分配，但是随着JIT编译器的发展与逃逸分析技术逐渐成熟，栈上分配、标量替换优化技术将会导致一些微妙的变化发生，所有对象都分配在堆上也渐渐变得不是那么“绝对”了。 Java椎是垃圾收集器管理主要区域，也叫“GC堆”（Garbage Collected Heap）。细分为新生代和老生代；再细致有Eden空间、From Survivor空间、To Survivor空间等。从内存分配角度，线程共享的Java椎中可能分出多个线程私有的分配缓冲区（Thread Local Allocation Buffer，TLAB）。 Java堆可以处于物理上不连续的内存，只要逻辑上是连续的即可。 方法区存储已被虚拟机加载的类信息、常量、静态变量、即使编译器编译后的代码等数据。HotSpot实现中，把方法区放在“永久代”（Permanent Generation），简化了内存管理，可以像管理堆一样管理这部分内存。规范对方法区限制比较宽松，可以选择不实现垃圾收集。当方法区无法满足内存分配需求时，将抛出OutOfMemoryError。 运行时常量池Runtime Constant Pool是方法区一部分。会抛出OutOfMemoryError。 直接内存JDK1.4中新加入NIO（New Input/Output）类，引入一种基于Channel与Buffer的I/O方式，它可以使用Native函数直接分配堆外内存，然后通过一个存储在Java堆中的DirectByteBuffer对象作为这块内存的引用进行操作。 本机直接内存分配不会受到Java堆大小限制，但是肯定还是受到本机内存（包括RAM以及SWAP区或者分页文件）大小以及处理器寻址空间限制。会抛出OutOfMemoryError异常。]]></content>
       <categories>
         <category>Java</category>
       </categories>
       <tags>
         <tag>Java</tag>
+        <tag>JVM</tag>
       </tags>
   </entry>
   <entry>
